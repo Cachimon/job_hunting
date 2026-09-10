@@ -19,7 +19,8 @@
     "build:win": "npm run obfuscate && npm run build && electron-builder --win",
     "build:mac": "npm run obfuscate && npm run build && electron-builder --mac",
     "build:linux": "npm run obfuscate && npm run build && electron-builder --linux",
-    "obfuscate": "node scripts/obfuscate.js"
+    "obfuscate": "node scripts/obfuscate.js",
+    "buildpy": "pyinstaller --onefile --name job_crawl --distpath resources --workpath py_build_temp py/job_crawl.py"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",

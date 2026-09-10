@@ -25,6 +25,7 @@ export interface UIConfigModel {
   systemPrompt?: string
   resumePath?: string
   startUrl?: string
+  recordOnly?: number
 }
 
 export interface SaveConfigRes {

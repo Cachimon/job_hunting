@@ -7,7 +7,10 @@ out
 .vscode
 岗位列表
 build
-py
-release
+release/*
 .idea
+py_build_temp
+.venv
+
+*.spec
 

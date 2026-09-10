@@ -49,6 +49,7 @@ export interface PyContactModel {
   resume_text?: string
   start_url?: string
   filename_fix: string
+  record_only?: number
 }
 
 const writeLog = async (status, data): Promise<void> => {

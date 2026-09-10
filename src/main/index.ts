@@ -5,7 +5,6 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { stopPyProc } from './python-contact'
 import registerEvent from './event'
-import { validateLicense, writeSysLog } from './utils'
 
 let mainWindow: BrowserWindow | null = null
 
@@ -57,14 +56,6 @@ app.whenReady().then(async () => {
 
   const userDataPath = app.getPath('userData')
   await fs.mkdir(userDataPath, { recursive: true })
-
-  const validator = await validateLicense()
-
-  if (!validator.valid) {
-    await writeSysLog('error', validator.reason)
-    app.exit()
-    return
-  }
 
   createWindow()
 

@@ -8,50 +8,132 @@
       </ul>
     </aside> -->
     <main>
-      <div ref="basicRef" class="setting-wrap">
+      <div
+        ref="basicRef"
+        class="setting-wrap"
+      >
         <h2>基础设置</h2>
         <ul class="setting-list">
           <li class="setting-list-item">
-            <label for="chromePath" class="setting-item-label required">
-              浏览器路径(Edge或谷歌)
-            </label>
+            <FormLabel
+              tips="如开启仅记录，则只会记录岗位信息（及AI分析结果），不会向BOSS打招呼"
+              text="仅记录"
+            />
+            <label> <input
+              v-model="configData.recordOnly"
+              type="radio"
+              :value="1"
+            >是 </label>
+            <label> <input
+              v-model="configData.recordOnly"
+              type="radio"
+              :value="0"
+            >否 </label>
+          </li>
+          <li class="setting-list-item">
+            <FormLabel
+              tips="exe后缀的浏览器路径"
+              text="浏览器路径(Edge或谷歌)"
+              required
+              for="chromePath"
+            />
             <input
               id="chromePath"
               readonly
               :value="configData.chromePath"
               class="config-path-input"
+            >
+            <button
+              class="config-btn"
+              @click="() => selectPath('chromePath')"
+            >
+              选择
+            </button>
+          </li>
+          <li class="setting-list-item">
+            <FormLabel
+              text="岗位信息存储路径"
+              for="jobPath"
             />
-            <button class="config-btn" @click="() => selectPath('chromePath')">选择</button>
+            <input
+              id="jobPath"
+              readonly
+              :value="configData.jobPath"
+              class="config-path-input"
+            >
+            <button
+              class="config-btn"
+              @click="() => selectPath('jobPath')"
+            >
+              选择
+            </button>
           </li>
           <li class="setting-list-item">
-            <label for="jobPath" class="setting-item-label">岗位存储路径</label>
-            <input id="jobPath" readonly :value="configData.jobPath" class="config-path-input" />
-            <button class="config-btn" @click="() => selectPath('jobPath')">选择</button>
+            <FormLabel
+              text="起始链接"
+              for="startUrl"
+              tips="默认是https://www.zhipin.com/web/geek/jobs，可在这个链接所在页面进行筛选之后复制网页地址并粘贴。也可使用默认链接，程序运行后再进行筛选。"
+            />
+            <input
+              id="startUrl"
+              v-model="configData.startUrl"
+              class="config-path-input"
+            >
           </li>
           <li class="setting-list-item">
-            <label for="startUrl" class="setting-item-label">起始链接</label>
-            <input id="startUrl" v-model="configData.startUrl" class="config-path-input" />
+            <FormLabel
+              tips="程序运行会打开浏览器，这个端口号是浏览器运行的端口号，如运行后报端口号的问题，可修改后尝试运行。"
+              text="端口号"
+              for="port"
+            />
+            <input
+              id="port"
+              v-model="configData.port"
+              type="number"
+            >
           </li>
           <li class="setting-list-item">
-            <label for="port" class="setting-item-label">端口号</label>
-            <input id="port" v-model="configData.port" type="number" />
+            <FormLabel
+              tips="秒为单位，设置合理时间可以模拟真人查看的场景，不被网站检测到爬虫的情况。"
+              text="岗位浏览时间"
+              for="delayTime"
+            />
+            <input
+              id="delayTime"
+              v-model="configData.delayTime"
+              type="number"
+            >
           </li>
           <li class="setting-list-item">
-            <label for="delayTime" class="setting-item-label">每次投递延迟时间</label>
-            <input id="delayTime" v-model="configData.delayTime" type="number" />
-          </li>
-          <li class="setting-list-item">
-            <label for="doneCount" class="setting-item-label">投递岗位数</label>
-            <input id="doneCount" v-model="configData.doneCount" type="number" />
+            <FormLabel
+              tips="每次执行需要投递的最大岗位数量，超过时结束运行。如仅记录模式，则限制可投递的岗位数量。"
+              text="投递岗位数"
+              for="doneCount"
+            />
+            <input
+              id="doneCount"
+              v-model="configData.doneCount"
+              type="number"
+            >
           </li>
         </ul>
       </div>
-      <div ref="filterRef" class="setting-wrap">
+      <div
+        ref="filterRef"
+        class="setting-wrap"
+      >
         <h2>岗位筛选设置</h2>
         <ul class="setting-list">
           <li class="setting-list-item">
-            <label for="searchWord" class="setting-item-label">岗位搜索词</label>
-            <input id="searchWord" v-model="configData.searchWord" />
+            <FormLabel
+              tips="以起始链接为准，如果起始链接包含query参数，则此配置不生效"
+              text="岗位搜索词"
+              for="searchWord"
+            />
+            <input
+              id="searchWord"
+              v-model="configData.searchWord"
+            >
           </li>
           <!-- <li class="setting-list-item">
             <label for="jobType" class="setting-item-label">求职类型</label>
@@ -62,7 +144,10 @@
             </select>
           </li> -->
           <li class="setting-list-item">
-            <label class="setting-item-label">公司黑名单</label>
+            <FormLabel
+              tips="公司名称如果包含其中任一设定的词语，则只记录，不投递。"
+              text="公司黑名单"
+            />
             <div class="tag-wrap">
               <span
                 v-for="(word, i) in configData.backlistCompany"
@@ -72,18 +157,28 @@
                 {{ word }}
                 <i @click="() => removeCom(i)">×</i>
               </span>
-              <input v-model="blackCom" />
-              <button :class="`config-btn ${blackCom ? '' : 'disabled'}`" @click="addNewCom">
+              <input v-model="blackCom">
+              <button
+                :class="`config-btn ${blackCom ? '' : 'disabled'}`"
+                @click="addNewCom"
+              >
                 新增
               </button>
             </div>
           </li>
           <li class="setting-list-item">
-            <label class="setting-item-label">岗位描述关键词</label>
+            <FormLabel
+              tips="可开启黑名单或白名单模式，黑名单即不投递“岗位描述”包含任一设定词语的岗位，白名单即只投递“岗位描述”包含任一设定词语的岗位。"
+              text="岗位描述关键词"
+            />
             <div class="desc-wrap">
               <div class="desc-item">
                 <label>
-                  <input v-model="configData.descType" type="radio" value="black" />黑名单:
+                  <input
+                    v-model="configData.descType"
+                    type="radio"
+                    value="black"
+                  >黑名单:
                 </label>
 
                 <div class="tag-wrap">
@@ -95,7 +190,7 @@
                     {{ word }}
                     <i @click="() => removeDesc('black', i)">×</i>
                   </span>
-                  <input v-model="blackDesc" />
+                  <input v-model="blackDesc">
                   <button
                     :class="`config-btn ${blackDesc ? '' : 'disabled'}`"
                     @click="() => addNewDesc('black')"
@@ -106,7 +201,11 @@
               </div>
               <div class="desc-item">
                 <label>
-                  <input v-model="configData.descType" type="radio" value="white" />白名单:
+                  <input
+                    v-model="configData.descType"
+                    type="radio"
+                    value="white"
+                  >白名单:
                 </label>
                 <div class="tag-wrap">
                   <span
@@ -117,7 +216,7 @@
                     {{ word }}
                     <i @click="() => removeDesc('white', i)">×</i>
                   </span>
-                  <input v-model="whiteDesc" />
+                  <input v-model="whiteDesc">
                   <button
                     :class="`config-btn ${whiteDesc ? '' : 'disabled'}`"
                     @click="() => addNewDesc('white')"
@@ -129,70 +228,140 @@
             </div>
           </li>
           <li class="setting-list-item">
-            <label class="setting-item-label">是否投递猎头</label>
-            <label> <input v-model="configData.isHunter" type="radio" :value="1" />是 </label>
-            <label> <input v-model="configData.isHunter" type="radio" :value="0" />否 </label>
+            <FormLabel
+              tips="根据BOSS的职位名称是否包含猎头，如不投递猎头，则将只记录，不投递"
+              text="是否投递猎头"
+            />
+            <label> <input
+              v-model="configData.isHunter"
+              type="radio"
+              :value="1"
+            >是 </label>
+            <label> <input
+              v-model="configData.isHunter"
+              type="radio"
+              :value="0"
+            >否 </label>
           </li>
         </ul>
       </div>
-      <div ref="aiRef" class="setting-wrap">
+      <div
+        ref="aiRef"
+        class="setting-wrap"
+      >
         <h2>AI设置</h2>
         <ul class="setting-list">
           <li class="setting-list-item">
-            <label class="setting-item-label">启用AI分析</label>
-            <label> <input v-model="configData.isAI" type="radio" :value="1" />是 </label>
-            <label> <input v-model="configData.isAI" type="radio" :value="0" />否 </label>
+            <FormLabel
+              text="启用AI分析"
+              tips="如不开启AI分析，则以下配置可不填写"
+            />
+            <label> <input
+              v-model="configData.isAI"
+              type="radio"
+              :value="1"
+            >是 </label>
+            <label> <input
+              v-model="configData.isAI"
+              type="radio"
+              :value="0"
+            >否 </label>
           </li>
           <li class="setting-list-item">
-            <label for="model" :class="`setting-item-label ${configData.isAI ? 'required' : ''}`">
-              模型名称
-            </label>
-            <input id="model" v-model="configData.model" />
+            <FormLabel
+              text="模型名称"
+              :required="!!configData.isAI"
+              for="model"
+            />
+            <input
+              id="model"
+              v-model="configData.model"
+            >
           </li>
           <li class="setting-list-item">
-            <label for="baseUrl" :class="`setting-item-label ${configData.isAI ? 'required' : ''}`">
-              模型链接
-            </label>
-            <input id="baseUrl" v-model="configData.baseUrl" class="config-path-input" />
+            <FormLabel
+              text="模型链接"
+              tips="也就是 base url"
+              :required="!!configData.isAI"
+              for="baseUrl"
+            />
+            <input
+              id="baseUrl"
+              v-model="configData.baseUrl"
+              class="config-path-input"
+            >
           </li>
           <li class="setting-list-item">
-            <label for="apiKey" class="setting-item-label">模型API KEY</label>
+            <FormLabel
+              text="模型API KEY"
+              tips="除了本地ollama模型，一般都需要配置API KEY，否则会报错。"
+              for="apiKey"
+            />
             <input
               id="apiKey"
               v-model="configData.apiKey"
               :type="apiKeyType"
               class="config-path-input"
-            />
-            <button v-if="configData.apiKey" class="config-btn" @click="changeApiKeyType">
+            >
+            <button
+              v-if="configData.apiKey"
+              class="config-btn"
+              @click="changeApiKeyType"
+            >
               {{ apiKeyType === 'password' ? '显示' : '隐藏' }}
             </button>
           </li>
           <li class="setting-list-item">
-            <label for="systemPrompt" class="setting-item-label">模型角色提示词</label>
-            <input id="systemPrompt" v-model="configData.systemPrompt" />
-          </li>
-          <li class="setting-list-item">
-            <label for="score" class="setting-item-label">通过分数</label>
-            <input id="score" v-model="configData.score" type="number" />
-          </li>
-          <li class="setting-list-item">
-            <label
-              for="resumePath"
-              :class="`setting-item-label ${configData.isAI ? 'required' : ''}`"
+            <FormLabel
+              text="模型角色提示词"
+              tips="调用AI时，加在系统提示词最前面的提示词。"
+              for="systemPrompt"
+            />
+            <input
+              id="systemPrompt"
+              v-model="configData.systemPrompt"
             >
-              岗位存储路径
-            </label>
+          </li>
+          <li class="setting-list-item">
+            <FormLabel
+              text="通过分数"
+              tips="AI分析后会返回一个分数（满分100），超过通过分数后则投递岗位。仅记录模式则不会投递。"
+              for="score"
+            />
+            <input
+              id="score"
+              v-model="configData.score"
+              type="number"
+            >
+          </li>
+          <li class="setting-list-item">
+            <FormLabel
+              text="简历路径"
+              tips="AI会根据简历分析与岗位适配度，暂时只支持.txt和.md格式。可让AI转格式，或生成简洁版本。"
+              for="resumePath"
+              :required="!!configData.isAI"
+            />
             <input
               id="resumePath"
               readonly
               :value="configData.resumePath"
               class="config-path-input"
-            />
-            <button class="config-btn" @click="() => selectPath('resumePath')">选择</button>
+            >
+            <button
+              class="config-btn"
+              @click="() => selectPath('resumePath')"
+            >
+              选择
+            </button>
           </li>
         </ul>
       </div>
-      <button class="primary config-save-btn" @click="save">保存</button>
+      <button
+        class="primary config-save-btn"
+        @click="save"
+      >
+        保存
+      </button>
     </main>
   </div>
 </template>
@@ -202,6 +371,7 @@ import useDebounce from '@renderer/hooks/useDebounce'
 import { useAppStore } from '@renderer/stores/appStore'
 import { UIConfigModel } from '@shared/type'
 import { onMounted, ref, toRaw } from 'vue'
+import FormLabel from './FormLabel.vue'
 
 // const basicRef = useTemplateRef<HTMLInputElement>('basicRef')
 // const filterRef = useTemplateRef<HTMLInputElement>('filterRef')
@@ -381,17 +551,10 @@ main {
   gap: 10px;
   align-items: start;
 }
-.setting-item-label {
+.form-label {
   flex: 0 0 150px;
-  position: relative;
 }
-.setting-item-label.required::before {
-  content: '*';
-  color: red;
-  position: absolute;
-  left: -10px;
-  top: 0;
-}
+
 .config-path-input {
   width: 600px;
 }

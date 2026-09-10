@@ -41,7 +41,8 @@ export const DEFAULT_CONFIG = {
   score: 80,
   systemPrompt: '你是一个专业的简历分析师',
   resumePath: '',
-  startUrl: 'https://www.zhipin.com/web/geek/jobs'
+  startUrl: 'https://www.zhipin.com/web/geek/jobs',
+  recordOnly: 0,
 }
 const FILENAME_FIX = 'job_list'
 
@@ -67,7 +68,8 @@ const getPyConfig = async (): Promise<PyContactModel> => {
     score: uiconfigData.score,
     system_prompt: uiconfigData.systemPrompt,
     start_url: uiconfigData.startUrl,
-    filename_fix: FILENAME_FIX
+    filename_fix: FILENAME_FIX,
+    record_only: uiconfigData.recordOnly,
   }
   if (uiconfigData.jobPath && !(await fileExists(uiconfigData.jobPath))) {
     return Promise.reject('岗位存储路径不存在或无法访问,请确认配置页是否正确配置路径')
@@ -136,7 +138,10 @@ export const getUserConfig = async (): Promise<UIConfigModel> => {
   try {
     const data = await fs.readFile(configFile, 'utf-8')
 
-    return Promise.resolve(JSON.parse(data))
+    const parseConfig = JSON.parse(data) as UIConfigModel
+    parseConfig.recordOnly = parseConfig.recordOnly || 0
+
+    return Promise.resolve(parseConfig)
   } catch (e) {
     return Promise.reject(`配置文件读取异常,请确认 ${configFile} 是否正常,或把数据备份后删除该文件`)
   }
